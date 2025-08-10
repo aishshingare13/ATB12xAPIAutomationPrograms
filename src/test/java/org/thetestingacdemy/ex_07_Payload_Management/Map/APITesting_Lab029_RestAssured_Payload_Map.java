@@ -1,8 +1,11 @@
 package org.thetestingacdemy.ex_07_Payload_Management.Map;
 
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import org.hamcrest.Matchers;
 import org.testng.annotations.Test;
 
 import java.util.LinkedHashMap;
@@ -46,6 +49,34 @@ public class APITesting_Lab029_RestAssured_Payload_Map {
         jsonBodyUsingMap.put("bookingdates",bookingDatesMap);
         jsonBodyUsingMap.put("additionalneeds", "Breakfast");
         System.out.println(jsonBodyUsingMap);
+
+        //HashMap ->JSON or class to json
+        //1. Gson
+        // 2. Jackson API
+
+        requestSpecification = RestAssured.given();
+        requestSpecification.baseUri("https://restful-booker.herokuapp.com/");
+        requestSpecification.basePath("/booking");
+        requestSpecification.contentType(ContentType.JSON);
+        requestSpecification.body(jsonBodyUsingMap).log().all();
+
+        Response response = requestSpecification.when().post();
+
+
+        // Get Validatable response to perform validation
+        validatableResponse = response.then().log().all();
+        validatableResponse.statusCode(200);
+
+        // Rest Assured -> import org.hamcrest.Matchers; %4-%5
+        // Matchers.equalto()
+
+        validatableResponse.body("booking.firstname", Matchers.equalTo("Aishwarya"));
+        validatableResponse.body("booking.lastname", Matchers.equalTo("Shingare"));
+        validatableResponse.body("booking.depositpaid", Matchers.equalTo(false));
+        validatableResponse.body("bookingid", Matchers.notNullValue());
+
+
+
 
 
 
